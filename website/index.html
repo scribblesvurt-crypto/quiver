@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiver — Claude Code Skill Manager</title>
+  <meta name="description" content="A local web UI for browsing, installing, and managing your Claude Code skills and marketplace plugins — without touching the terminal.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Quiver — Claude Code Skill Manager">
+  <meta property="og:description" content="Your Claude Code skills, finally in one place.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://skillquiver.com">
+  <meta property="og:image" content="https://skillquiver.com/og-image.png">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect rx='20' width='100' height='100' fill='%236366f1'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='white' font-family='system-ui' font-weight='bold'>Q</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ── Nav ──────────────────────────────────── -->
+  <nav class="nav" id="nav">
+    <a href="/" class="nav-logo">
+      <svg width="28" height="28" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <rect rx="20" width="100" height="100" fill="#6366f1"/>
+        <text x="50" y="68" font-size="55" text-anchor="middle" fill="white" font-family="system-ui" font-weight="bold">Q</text>
+      </svg>
+      Quiver
+    </a>
+    <div class="nav-links">
+      <a href="https://github.com/scribblesvurt-crypto/quiver" target="_blank" rel="noopener" class="btn btn-ghost">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        GitHub
+      </a>
+      <a href="https://github.com/scribblesvurt-crypto/quiver/releases/latest/download/Quiver.zip" class="btn btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download .app
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Hero ─────────────────────────────────── -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-eyebrow">
+        <svg width="12" height="12" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect rx="4" width="100" height="100" fill="#6366f1"/><text x="50" y="68" font-size="55" text-anchor="middle" fill="white" font-family="system-ui" font-weight="bold">Q</text></svg>
+        Your skills armoury — no skill required.
+      </div>
+
+      <h1>Your Claude Code skills,<br><span class="gradient">finally in one place.</span></h1>
+
+      <p class="hero-sub">
+        Quiver is a local web UI for browsing, installing, and managing your Claude Code skills and marketplace plugins — without touching the terminal.
+      </p>
+
+      <div class="hero-ctas">
+        <a href="https://github.com/scribblesvurt-crypto/quiver/releases/latest/download/Quiver.zip" class="btn btn-primary btn-lg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download for macOS
+        </a>
+        <a href="#install" class="btn btn-lg">or install with npm →</a>
+      </div>
+
+      <div class="hero-trust">
+        <span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Open source · MIT
+        </span>
+        <span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          macOS · ~1.8MB
+        </span>
+        <span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          No account required
+        </span>
+      </div>
+
+      <!-- App mock (replace browser-body content with real screenshot when ready) -->
+      <div class="hero-screenshot">
+        <div class="browser-chrome">
+          <div class="browser-chrome-bar">
+            <div class="browser-dots">
+              <span class="dot-red"></span>
+              <span class="dot-yellow"></span>
+              <span class="dot-green"></span>
+            </div>
+            <div class="browser-url">localhost:3456 — Quiver</div>
+          </div>
+          <div class="browser-body">
+            <!-- Replace with: <img src="app-screenshot.png" alt="Quiver UI showing skill cards with tabs and search"> -->
+            <div class="screenshot-placeholder">
+              <div class="mock-ui">
+                <div class="mock-header">
+                  <span class="mock-title">Quiver</span>
+                  <input class="mock-search" type="text" placeholder="Search skills…" readonly>
+                </div>
+                <div class="mock-tabs">
+                  <div class="mock-tab active">All <span class="mock-tab-count">12</span></div>
+                  <div class="mock-tab">Local <span class="mock-tab-count-plain">7</span></div>
+                  <div class="mock-tab">Marketplace <span class="mock-tab-count-plain">5</span></div>
+                  <div class="mock-tab">Browse</div>
+                </div>
+                <div class="mock-grid">
+                  <div class="mock-card local">
+                    <div class="mock-card-name">commit <span class="source-badge local">Local</span></div>
+                    <div class="mock-card-desc">Stage and create git commits with a message</div>
+                  </div>
+                  <div class="mock-card local">
+                    <div class="mock-card-name">review-pr <span class="source-badge local">Local</span></div>
+                    <div class="mock-card-desc">Review a GitHub pull request by number</div>
+                  </div>
+                  <div class="mock-card plugin">
+                    <div class="mock-card-name">deploy <span class="source-badge plugin">Plugin</span></div>
+                    <div class="mock-card-desc">Deploy to Netlify from the current directory</div>
+                  </div>
+                  <div class="mock-card plugin">
+                    <div class="mock-card-name">test-runner <span class="source-badge plugin">Plugin</span></div>
+                    <div class="mock-card-desc">Run the full test suite with coverage report</div>
+                  </div>
+                  <div class="mock-card local">
+                    <div class="mock-card-name">refactor <span class="source-badge local">Local</span></div>
+                    <div class="mock-card-desc">Safely refactor a function or module</div>
+                  </div>
+                  <div class="mock-card plugin">
+                    <div class="mock-card-name">db-migrate <span class="source-badge plugin">Plugin</span></div>
+                    <div class="mock-card-desc">Run pending Supabase migrations</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Problem strip ─────────────────────────── -->
+  <section class="problem-strip section-sm">
+    <div class="container">
+      <div class="problem-grid">
+        <div class="problem-item">
+          <div class="problem-icon">📂</div>
+          <h3>Skills scattered everywhere</h3>
+          <p>Local skills, marketplace plugins, and project-specific commands all live in different directories with no unified view.</p>
+        </div>
+        <div class="problem-item">
+          <div class="problem-icon">⌨️</div>
+          <h3>CLI-only management</h3>
+          <p>The only way to manage Claude Code skills is through the terminal — no GUI, no search, no drag-and-drop.</p>
+        </div>
+        <div class="problem-item">
+          <div class="problem-icon">🔍</div>
+          <h3>Plugins buried deep</h3>
+          <p>Marketplace plugin skills hide in nested directories several levels deep, making them nearly impossible to discover.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Features ──────────────────────────────── -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="features-heading">
+        <h2>Everything your skills need.<br>Nothing you don't.</h2>
+        <p>A clean, focused tool built for Claude Code users who want a real interface.</p>
+      </div>
+
+      <!-- Feature 1: Unified inventory -->
+      <div class="feature-row">
+        <div class="feature-text">
+          <h3>One view for all your skills</h3>
+          <p>Quiver scans <code>~/.claude/skills/</code> and all your marketplace plugins, showing everything in a single searchable grid. Colour-coded so you always know what's local and what's from a plugin.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Local skills</span>
+            <span class="feature-tag">Marketplace plugins</span>
+            <span class="feature-tag">Search &amp; filter</span>
+          </div>
+        </div>
+        <div class="feature-visual">
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <span style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;background:var(--accent);color:white;">All <span style="background:rgba(255,255,255,0.25);padding:1px 6px;border-radius:8px;margin-left:4px;">12</span></span>
+            <span style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:500;color:var(--text-secondary);background:var(--bg);border:1px solid var(--border);">Local</span>
+            <span style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:500;color:var(--text-secondary);background:var(--bg);border:1px solid var(--border);">Marketplace</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--source-local);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:14px;font-weight:600;">commit</span>
+              <span class="source-badge local">Local</span>
+            </div>
+            <div style="background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--source-plugin);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:14px;font-weight:600;">deploy</span>
+              <span class="source-badge plugin">Plugin</span>
+            </div>
+            <div style="background:var(--bg);border:1px solid var(--border);border-left:3px solid var(--source-local);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:14px;font-weight:600;">review-pr</span>
+              <span class="source-badge local">Local</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 2: Sync across machines -->
+      <div class="feature-row reverse">
+        <div class="feature-text">
+          <h3>Same skills on every machine</h3>
+          <p>Point Quiver at a Git repo and your skills follow you everywhere. Push from your work Mac, pull on your home Mac — or share a team repo so everyone stays in sync. Works with any Git host.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Git-backed sync</span>
+            <span class="feature-tag">Cross-machine</span>
+            <span class="feature-tag">Team sharing</span>
+          </div>
+        </div>
+        <div class="feature-visual">
+          <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin-bottom:14px;">Sync Status</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;">
+              <span style="font-size:13px;color:var(--text-secondary);">Remote</span>
+              <span style="font-family:monospace;font-size:12px;color:var(--text);">github.com/sam/skills</span>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <div style="flex:1;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:8px;padding:10px 14px;text-align:center;">
+                <div style="font-size:11px;color:#22c55e;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Up to date</div>
+                <div style="font-size:12px;color:var(--text-secondary);">12 skills synced</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px;justify-content:center;">
+                <span style="padding:6px 14px;border-radius:6px;background:var(--accent);color:white;font-size:12px;font-weight:500;text-align:center;">Push</span>
+                <span style="padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--surface);font-size:12px;font-weight:500;text-align:center;">Pull</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 3: Browse & discover -->
+      <div class="feature-row">
+        <div class="feature-text">
+          <h3>Discover skills from the community</h3>
+          <p>The Browse tab surfaces skills from community marketplaces — toggle sources on or off, filter by category, and install anything with one click. No URLs, no cloning, no terminal.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Community registry</span>
+            <span class="feature-tag">One-click install</span>
+            <span class="feature-tag">Category filter</span>
+          </div>
+        </div>
+        <div class="feature-visual">
+          <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin-bottom:12px;">Browse</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Claude Code Skills</div>
+                <div style="font-size:11px;color:var(--text-secondary);">43 production-ready skills</div>
+              </div>
+              <span style="padding:5px 12px;border-radius:6px;background:var(--accent);color:white;font-size:12px;font-weight:500;flex-shrink:0;">Install</span>
+            </div>
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Context Engineering Kit</div>
+                <div style="font-size:11px;color:var(--text-secondary);">Multi-agent workflow skills</div>
+              </div>
+              <span style="padding:5px 12px;border-radius:6px;background:rgba(34,197,94,0.1);color:#22c55e;font-size:12px;font-weight:500;flex-shrink:0;">Installed</span>
+            </div>
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Trail of Bits Curated</div>
+                <div style="font-size:11px;color:var(--text-secondary);">Security-focused, vetted skills</div>
+              </div>
+              <span style="padding:5px 12px;border-radius:6px;background:var(--accent);color:white;font-size:12px;font-weight:500;flex-shrink:0;">Install</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 4: Edit in UI -->
+      <div class="feature-row reverse">
+        <div class="feature-text">
+          <h3>Edit skills without leaving the browser</h3>
+          <p>Click Edit on any local skill to modify its content directly in the web UI. Save or cancel — no text editor, no file path hunting, no terminal. Your changes are written straight to disk.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">In-browser editing</span>
+            <span class="feature-tag">Save to disk</span>
+            <span class="feature-tag">Local skills</span>
+          </div>
+        </div>
+        <div class="feature-visual">
+          <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-secondary);margin-bottom:12px;">Editing: commit</div>
+          <div style="background:var(--bg);border:1px solid var(--accent);border-radius:var(--radius);padding:14px;font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:12px;line-height:1.7;color:var(--text);margin-bottom:12px;min-height:110px;">
+            <span style="color:var(--text-secondary);">---</span><br>
+            <span style="color:var(--source-local);">name:</span> commit<br>
+            <span style="color:var(--source-local);">description:</span> Stage and commit<br>
+            <span style="color:var(--text-secondary);">---</span><br>
+            Stage changed files and create a git...
+          </div>
+          <div style="display:flex;gap:8px;">
+            <span style="padding:7px 16px;border-radius:var(--radius);background:var(--accent);color:white;font-size:13px;font-weight:500;">Save</span>
+            <span style="padding:7px 16px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);font-size:13px;font-weight:500;">Cancel</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 5: Drag & drop -->
+      <div class="feature-row">
+        <div class="feature-text">
+          <h3>Import skills in two seconds</h3>
+          <p>Got a <code>.skill.zip</code> from a teammate or found one online? Drop it straight onto Quiver. It unpacks, registers, and appears in your grid instantly. No commands, no path wrangling.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">Drag &amp; drop</span>
+            <span class="feature-tag">.skill.zip import</span>
+            <span class="feature-tag">Instant</span>
+          </div>
+        </div>
+        <div class="feature-visual" style="align-items:center;justify-content:center;text-align:center;">
+          <div style="border:2px dashed var(--accent);border-radius:var(--radius);padding:40px 32px;background:rgba(99,102,241,0.04);">
+            <div style="font-size:32px;margin-bottom:12px;">📦</div>
+            <div style="font-size:15px;font-weight:600;color:var(--accent);margin-bottom:6px;">Drop .skill.zip here</div>
+            <div style="font-size:13px;color:var(--text-secondary);">or click to browse</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 6: macOS app -->
+      <div class="feature-row reverse">
+        <div class="feature-text">
+          <h3>Stays out of your way until you need it</h3>
+          <p>Download the standalone <code>Quiver.app</code> (~1.8MB — no installer). Turn on Launch on Startup and your bookmark at <code>localhost:3456</code> always works, even after a reboot.</p>
+          <div class="feature-tags">
+            <span class="feature-tag">macOS app</span>
+            <span class="feature-tag">~1.8MB</span>
+            <span class="feature-tag">Launch on startup</span>
+          </div>
+        </div>
+        <div class="feature-visual" style="align-items:center;justify-content:center;gap:20px;">
+          <div style="width:80px;height:80px;border-radius:20px;background:#6366f1;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(99,102,241,0.35);">
+            <svg width="44" height="44" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <text x="50" y="68" font-size="60" text-anchor="middle" fill="white" font-family="system-ui" font-weight="bold">Q</text>
+            </svg>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:15px;font-weight:600;margin-bottom:4px;">Quiver.app</div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;">~1.8MB · macOS</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-secondary);">
+              <span>Launch on startup</span>
+              <span style="width:36px;height:20px;background:var(--accent);border-radius:10px;position:relative;flex-shrink:0;display:inline-block;">
+                <span style="width:16px;height:16px;background:white;border-radius:50%;position:absolute;top:2px;right:2px;"></span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── How it works ───────────────────────────── -->
+  <section class="how-it-works section" id="install">
+    <div class="container">
+      <div class="how-heading">
+        <h2>Up and running in under a minute.</h2>
+        <p>Pick the install method that suits you.</p>
+      </div>
+
+      <div class="install-tabs">
+        <button class="install-tab active" onclick="showTab('app')">macOS App</button>
+        <button class="install-tab" onclick="showTab('npm')">npm</button>
+      </div>
+
+      <div class="install-content active" id="tab-app">
+        <div class="install-steps">
+          <div class="install-step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h4>Download Quiver.app</h4>
+              <p>Click the download button. ~1.8MB — no installer, no dependencies to manage.</p>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h4>Open and allow</h4>
+              <p>Drag to Applications. Right-click → Open to bypass Gatekeeper the first time (standard for unsigned apps).</p>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h4>Your skills, instantly</h4>
+              <p>Quiver opens <code>localhost:3456</code> and scans your skills automatically. That's it.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="install-content" id="tab-npm">
+        <div class="install-steps">
+          <div class="install-step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h4>Install globally</h4>
+              <div class="code-block">
+                <span>npm install -g quiver-skill-manager</span>
+                <button class="copy-btn" onclick="copyCode(this, 'npm install -g quiver-skill-manager')">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h4>Launch the UI</h4>
+              <div class="code-block">
+                <span>quiver ui</span>
+                <button class="copy-btn" onclick="copyCode(this, 'quiver ui')">Copy</button>
+              </div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h4>Open in browser</h4>
+              <p>Quiver opens <code>http://localhost:3456</code> automatically. Bookmark it.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CLI Reference ──────────────────────────── -->
+  <section class="section-sm section" id="cli">
+    <div class="container">
+      <div class="features-heading" style="margin-bottom:40px;">
+        <h2 style="font-size:clamp(24px,3vw,34px);">Prefer the terminal? Quiver has you covered.</h2>
+        <p>The full CLI is available for power users and automation.</p>
+      </div>
+      <div class="cli-table-wrap">
+        <div class="cli-row">
+          <div class="cli-cmd">quiver ui</div>
+          <div class="cli-desc">Launch the web interface</div>
+        </div>
+        <div class="cli-row">
+          <div class="cli-cmd">quiver list</div>
+          <div class="cli-desc">List all skills with source and description</div>
+        </div>
+        <div class="cli-row">
+          <div class="cli-cmd">quiver add &lt;path&gt;</div>
+          <div class="cli-desc">Symlink a skill into ~/.claude/skills/</div>
+        </div>
+        <div class="cli-row">
+          <div class="cli-cmd">quiver remove &lt;name&gt;</div>
+          <div class="cli-desc">Remove a skill</div>
+        </div>
+        <div class="cli-row">
+          <div class="cli-cmd">quiver import &lt;zip&gt;</div>
+          <div class="cli-desc">Import a .skill.zip archive</div>
+        </div>
+        <div class="cli-row">
+          <div class="cli-cmd">quiver export &lt;name&gt;</div>
+          <div class="cli-desc">Export a skill as a .skill.zip</div>
+        </div>
+        <div class="cli-row">
+          <div class="cli-cmd">quiver sync</div>
+          <div class="cli-desc">Push/pull skills via a Git remote</div>
+        </div>
+        <div class="cli-row">
+          <div class="cli-cmd">quiver browse</div>
+          <div class="cli-desc">Discover and install from community marketplaces</div>
+        </div>
+        <div class="cli-row">
+          <div class="cli-cmd">quiver config</div>
+          <div class="cli-desc">Get or set configuration values</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Open Source CTA ────────────────────────── -->
+  <section class="section oss-cta">
+    <div class="container">
+      <h2>Free and open source. Always.</h2>
+      <p>Quiver is MIT licensed. File issues, submit skills, or fork it and build your own backend. Claude Code users built this for Claude Code users.</p>
+      <div class="oss-buttons">
+        <a href="https://github.com/scribblesvurt-crypto/quiver" target="_blank" rel="noopener" class="btn btn-lg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+        <a href="https://github.com/scribblesvurt-crypto/quiver" target="_blank" rel="noopener" class="btn btn-primary btn-lg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Star the repo
+        </a>
+      </div>
+      <div class="oss-made-by">
+        Built for Claude Code · Made by <a href="https://viberpsychosis.com" target="_blank" rel="noopener">Sam</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ─────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer-left">
+      <a href="/" class="nav-logo" style="font-size:14px;gap:7px;">
+        <svg width="20" height="20" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect rx="20" width="100" height="100" fill="#6366f1"/><text x="50" y="68" font-size="55" text-anchor="middle" fill="white" font-family="system-ui" font-weight="bold">Q</text></svg>
+        Quiver
+      </a>
+      <span class="footer-sep">·</span>
+      <span>MIT License</span>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/scribblesvurt-crypto/quiver" target="_blank" rel="noopener">GitHub</a>
+      <span class="footer-sep">·</span>
+      <span>skillquiver.com</span>
+    </div>
+    <div class="footer-right">
+      Made by <a href="https://viberpsychosis.com" target="_blank" rel="noopener">viberpsychosis.com</a>
+    </div>
+  </footer>
+
+  <script>
+    // Sticky nav
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+
+    // Install tabs
+    function showTab(name) {
+      document.querySelectorAll('.install-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.install-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    // Copy to clipboard
+    function copyCode(btn, text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = orig; }, 1800);
+      });
+    }
+  </script>
+</body>
+</html>
