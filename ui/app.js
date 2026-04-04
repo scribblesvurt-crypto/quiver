@@ -1,6 +1,6 @@
-import { h, render } from 'https://esm.sh/preact@10.25.4';
-import { useState, useEffect, useCallback } from 'https://esm.sh/preact@10.25.4/hooks';
-import htm from 'https://esm.sh/htm@3.1.1';
+import { h, render } from './vendor/preact.mjs';
+import { useState, useEffect, useCallback } from './vendor/preact-hooks.mjs';
+import htm from './vendor/htm.mjs';
 
 const html = htm.bind(h);
 

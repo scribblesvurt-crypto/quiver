@@ -1,11 +1,22 @@
 {
-  "name": "quiver",
+  "name": "quiver-skill-manager",
   "version": "0.1.0",
   "description": "Manage Claude Code skills with a web UI and CLI",
   "type": "module",
   "bin": {
     "quiver": "./bin/quiver.js"
   },
+  "files": [
+    "bin/",
+    "src/",
+    "ui/",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scribblesvurt-crypto/quiver.git"
+  },
+  "homepage": "https://skillquiver.com",
   "scripts": {
     "start": "node src/cli.js",
     "ui": "node src/cli.js ui"
@@ -14,6 +25,7 @@
     "claude",
     "claude-code",
     "skills",
+    "skill-manager",
     "quiver",
     "cli"
   ],
