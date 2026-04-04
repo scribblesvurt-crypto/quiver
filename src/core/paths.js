@@ -9,6 +9,7 @@ export const PLUGINS_DIR = join(home, '.claude', 'plugins', 'marketplaces');
 export const CONFIG_DIR = join(home, '.quiver');
 export const CONFIG_FILE = join(CONFIG_DIR, 'config.json');
 export const SYNC_DIR = join(CONFIG_DIR, 'sync');
+export const MANIFEST_FILE = join(CONFIG_DIR, 'installed-plugins.json');
 
 export function ensureDirs() {
   mkdirSync(SKILLS_DIR, { recursive: true });

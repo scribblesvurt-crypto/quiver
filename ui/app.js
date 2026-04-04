@@ -107,7 +107,10 @@ const api = {
   async syncPull() {
     const res = await fetch('/api/sync/pull', { method: 'POST' });
     return res.json();
-  }
+  },
+  async registryUpdates() { const r = await fetch('/api/registry/updates'); return r.json(); },
+  async registryCheckUpdates() { const r = await fetch('/api/registry/updates/check', { method: 'POST' }); return r.json(); },
+  async registryUpdate(name, marketplace) { const r = await fetch('/api/registry/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, marketplace }) }); return r.json(); }
 };
 
 // --- Toast ---
@@ -379,13 +382,15 @@ function SourcesPanel({ onClose, onChanged }) {
 }
 
 // --- Browse Card ---
-function BrowseCard({ plugin, onClick }) {
+function BrowseCard({ plugin, updateAvailable, onClick }) {
+  const badgeClass = plugin.installed ? (updateAvailable ? 'update' : 'installed') : 'available';
+  const badgeLabel = plugin.installed ? (updateAvailable ? 'Update' : 'Installed') : 'Available';
   return html`
     <div class="browse-card ${plugin.installed ? 'installed' : ''}" onClick=${() => onClick(plugin)}>
       <div class="browse-card-header">
         <h3>${plugin.name}</h3>
-        <span class="status-badge ${plugin.installed ? 'installed' : 'available'}">
-          ${plugin.installed ? 'Installed' : 'Available'}
+        <span class="status-badge ${badgeClass}">
+          ${badgeLabel}
         </span>
       </div>
       <p>${plugin.description || 'No description'}</p>
@@ -398,8 +403,9 @@ function BrowseCard({ plugin, onClick }) {
 }
 
 // --- Browse Detail Panel ---
-function BrowseDetail({ plugin, onClose, onToast, onRefresh }) {
+function BrowseDetail({ plugin, updateAvailable, onClose, onToast, onRefresh }) {
   const [installing, setInstalling] = useState(false);
+  const [updating, setUpdating] = useState(false);
   const installCmd = `claude /plugin install ${plugin.name}`;
 
   async function handleInstall() {
@@ -413,6 +419,19 @@ function BrowseDetail({ plugin, onClose, onToast, onRefresh }) {
       onToast(result.error || 'Install failed');
     }
     setInstalling(false);
+  }
+
+  async function handleUpdate() {
+    setUpdating(true);
+    const result = await api.registryUpdate(plugin.name, plugin.marketplace);
+    if (result.ok) {
+      onToast(`Updated: ${plugin.name}`);
+      onRefresh();
+      onClose();
+    } else {
+      onToast(result.error || 'Update failed');
+    }
+    setUpdating(false);
   }
 
   async function copyCommand() {
@@ -429,8 +448,8 @@ function BrowseDetail({ plugin, onClose, onToast, onRefresh }) {
       <div class="detail-panel">
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
           <h2 style="margin: 0;">${plugin.name}</h2>
-          <span class="status-badge ${plugin.installed ? 'installed' : 'available'}">
-            ${plugin.installed ? 'Installed' : 'Available'}
+          <span class="status-badge ${plugin.installed ? (updateAvailable ? 'update' : 'installed') : 'available'}">
+            ${plugin.installed ? (updateAvailable ? 'Update Available' : 'Installed') : 'Available'}
           </span>
         </div>
         <p class="description">${plugin.description || 'No description'}</p>
@@ -469,7 +488,21 @@ function BrowseDetail({ plugin, onClose, onToast, onRefresh }) {
           </div>
         `}
 
-        ${plugin.installed && html`
+        ${plugin.installed && updateAvailable && html`
+          <div class="detail-section">
+            <h4>Update</h4>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <button class="btn btn-primary" onClick=${handleUpdate} disabled=${updating} style="background: #f59e0b; border-color: #f59e0b;">
+                ${updating ? 'Updating...' : 'Update Plugin'}
+              </button>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+              A newer version is available from the source repository.
+            </p>
+          </div>
+        `}
+
+        ${plugin.installed && !updateAvailable && html`
           <div class="detail-section">
             <p style="font-size: 13px; color: var(--source-plugin);">
               This plugin is already installed. Its skills appear in the Marketplace tab.
@@ -651,6 +684,7 @@ function App() {
   const [browseSelected, setBrowseSelected] = useState(null);
   const [browseLoaded, setBrowseLoaded] = useState(false);
   const [showSources, setShowSources] = useState(false);
+  const [pluginUpdates, setPluginUpdates] = useState({});
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -680,6 +714,11 @@ function App() {
     refresh();
     refreshSync();
     api.getStartup().then(d => setStartupEnabled(d.enabled)).catch(() => {});
+    api.registryUpdates().then(d => {
+      const map = {};
+      for (const u of (d.updates || [])) map[`${u.marketplace}/${u.name}`] = u;
+      setPluginUpdates(map);
+    }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -811,6 +850,15 @@ function App() {
         <button class="category-pill sources-btn" onClick=${() => setShowSources(true)}>
           Sources
         </button>
+        <button class="check-updates-btn" onClick=${async () => {
+          const result = await api.registryCheckUpdates();
+          const map = {};
+          for (const u of (result.plugins || []).filter(p => p.updateAvailable)) map[`${u.marketplace}/${u.name}`] = u;
+          setPluginUpdates(map);
+          setToast(result.updatesAvailable > 0 ? `${result.updatesAvailable} update${result.updatesAvailable !== 1 ? 's' : ''} available` : 'All plugins up to date');
+        }}>
+          Check Updates${Object.keys(pluginUpdates).length > 0 ? html`<span class="update-dot">${Object.keys(pluginUpdates).length}</span>` : ''}
+        </button>
         <span class="category-divider"></span>
         <button class="category-pill ${!browseCategory ? 'active' : ''}" onClick=${() => setBrowseCategory(null)}>
           All
@@ -873,7 +921,7 @@ function App() {
         ${browseLoaded && html`
           <div class="skill-grid">
             ${browseFiltered.map(p => html`
-              <${BrowseCard} key=${p.name} plugin=${p} onClick=${setBrowseSelected} />
+              <${BrowseCard} key=${p.name} plugin=${p} updateAvailable=${!!pluginUpdates[`${p.marketplace}/${p.name}`]} onClick=${setBrowseSelected} />
             `)}
           </div>
         `}
@@ -890,9 +938,17 @@ function App() {
     ${browseSelected && html`
       <${BrowseDetail}
         plugin=${browseSelected}
+        updateAvailable=${!!pluginUpdates[`${browseSelected.marketplace}/${browseSelected.name}`]}
         onClose=${() => setBrowseSelected(null)}
         onToast=${setToast}
-        onRefresh=${() => { setBrowseLoaded(false); loadBrowse(); refresh(); }}
+        onRefresh=${() => {
+          setBrowseLoaded(false); loadBrowse(); refresh();
+          api.registryUpdates().then(d => {
+            const map = {};
+            for (const u of (d.updates || [])) map[`${u.marketplace}/${u.name}`] = u;
+            setPluginUpdates(map);
+          }).catch(() => {});
+        }}
       />
     `}
 

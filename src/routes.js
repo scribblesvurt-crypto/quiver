@@ -12,6 +12,7 @@ import { importSkill } from './core/import.js';
 import { SKILLS_DIR, PLUGINS_DIR } from './core/paths.js';
 import { syncInit, syncSetRemote, syncPush, syncPull, syncStatus } from './core/sync/index.js';
 import { listAvailablePlugins, listCategories, listSources, setSourceEnabled, installPlugin } from './core/registry.js';
+import { getUpdateSummary, checkAllUpdates, updatePlugin } from './core/updates.js';
 
 const upload = multer({ dest: join(tmpdir(), 'skill-manager-uploads'), limits: { fileSize: 10 * 1024 * 1024 } });
 
@@ -272,6 +273,36 @@ export function createRoutes() {
       if (!id) return res.status(400).json({ error: 'Source ID required' });
       const updated = setSourceEnabled(id, enabled);
       res.json({ ok: true, enabled: updated });
+    } catch (e) {
+      res.status(500).json({ error: sanitizeError(e.message) });
+    }
+  });
+
+  router.get('/registry/updates', (req, res) => {
+    try {
+      res.json(getUpdateSummary());
+    } catch (e) {
+      res.status(500).json({ error: sanitizeError(e.message) });
+    }
+  });
+
+  router.post('/registry/updates/check', async (req, res) => {
+    try {
+      const result = await checkAllUpdates({ force: true });
+      res.json(result);
+    } catch (e) {
+      res.status(500).json({ error: sanitizeError(e.message) });
+    }
+  });
+
+  router.post('/registry/update', async (req, res) => {
+    try {
+      const { name, marketplace } = req.body;
+      if (!name || !/^[a-zA-Z0-9_-]+$/.test(name)) {
+        return res.status(400).json({ error: 'Invalid plugin name' });
+      }
+      const result = await updatePlugin(name, marketplace);
+      res.json(result);
     } catch (e) {
       res.status(500).json({ error: sanitizeError(e.message) });
     }

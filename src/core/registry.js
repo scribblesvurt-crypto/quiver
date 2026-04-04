@@ -4,6 +4,7 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { loadConfig, setConfigValue } from './config.js';
 import { CONFIG_DIR } from './paths.js';
+import { recordInstall } from './updates.js';
 
 const PLUGINS_BASE = join(homedir(), '.claude', 'plugins');
 const KNOWN_MARKETPLACES_FILE = join(PLUGINS_BASE, 'known_marketplaces.json');
@@ -416,6 +417,12 @@ export async function installPlugin(name, marketplaceId) {
         execFileSync('git', ['clone', '--depth', '1', gitUrl, destDir], {
           encoding: 'utf-8', stdio: 'pipe', timeout: 120000
         });
+        const commitHash = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: destDir, stdio: 'pipe' }).toString().trim();
+        recordInstall(name, mp.id || 'unknown', {
+          installPath: destDir,
+          sourceRepo: source.repo || source.url || null,
+          commitHash
+        });
         return { ok: true, message: `Installed ${name} from ${gitUrl}` };
       } catch (e) {
         const detail = (e.stderr || e.message || '').replace(/\/[^\s:]+/g, '<path>');
@@ -436,6 +443,12 @@ export async function installPlugin(name, marketplaceId) {
           mkdirSync(join(localMP.installLocation, 'external_plugins'), { recursive: true });
           cpSync(subPath, destDir, { recursive: true });
         }
+        const commitHash = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmpDir, stdio: 'pipe' }).toString().trim();
+        recordInstall(name, mp.id || 'unknown', {
+          installPath: destDir,
+          sourceRepo: source.url || null,
+          commitHash
+        });
         rmSync(tmpDir, { recursive: true, force: true });
         return { ok: true, message: `Installed ${name}` };
       } catch (e) {
@@ -480,6 +493,13 @@ export async function installPlugin(name, marketplaceId) {
     } else {
       throw new Error(`Plugin directory not found in repo: ${sourcePath}`);
     }
+
+    const commitHash = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmpDir, stdio: 'pipe' }).toString().trim();
+    recordInstall(name, remoteSource.id || 'unknown', {
+      installPath: destDir,
+      sourceRepo: remoteSource.repo || null,
+      commitHash
+    });
 
     rmSync(tmpDir, { recursive: true, force: true });
     return { ok: true, message: `Installed ${name} to ~/.claude/skills/` };

@@ -832,6 +832,42 @@ body {
   color: var(--danger);
 }
 
+.status-badge.update {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.update-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  background: #f59e0b;
+  border-radius: 8px;
+  padding: 0 4px;
+  margin-left: 4px;
+}
+
+.check-updates-btn {
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.check-updates-btn:hover {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
 /* Ghost button */
 .btn-ghost {
   background: transparent;
