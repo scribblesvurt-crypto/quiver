@@ -1,12 +1,12 @@
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { existsSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { SYNC_DIR } from '../paths.js';
 import { loadConfig, setConfigValue } from '../config.js';
 import { snapshotToSync, snapshotFromSync, diffLocalVsSync } from './snapshot.js';
 
-const git = (cmd, opts = {}) =>
-  execSync(`git ${cmd}`, { cwd: SYNC_DIR, encoding: 'utf-8', stdio: 'pipe', ...opts }).trim();
+const git = (args, opts = {}) =>
+  execFileSync('git', args, { cwd: SYNC_DIR, encoding: 'utf-8', stdio: 'pipe', timeout: 30000, ...opts }).trim();
 
 function isGitRepo() {
   return existsSync(join(SYNC_DIR, '.git'));
@@ -14,13 +14,13 @@ function isGitRepo() {
 
 function hasRemote() {
   try {
-    return git('remote').length > 0;
+    return git(['remote']).length > 0;
   } catch { return false; }
 }
 
 function hasCommits() {
   try {
-    git('rev-parse HEAD');
+    git(['rev-parse', 'HEAD']);
     return true;
   } catch { return false; }
 }
@@ -30,15 +30,15 @@ export function syncInit() {
     return { ok: true, message: 'Sync already initialized.' };
   }
 
-  git('init');
+  git(['init']);
   writeFileSync(join(SYNC_DIR, '.gitignore'), '.DS_Store\n');
 
   // Snapshot current skills and make initial commit
   const changes = snapshotToSync();
-  git('add -A');
+  git(['add', '-A']);
 
   try {
-    git('commit -m "Initial Quiver sync"');
+    git(['commit', '-m', 'Initial Quiver sync']);
   } catch {
     // Nothing to commit (no skills yet)
   }
@@ -64,9 +64,9 @@ export function syncSetRemote(url) {
 
   try {
     if (hasRemote()) {
-      git(`remote set-url origin ${url}`);
+      git(['remote', 'set-url', 'origin', url]);
     } else {
-      git(`remote add origin ${url}`);
+      git(['remote', 'add', 'origin', url]);
     }
   } catch (e) {
     return { ok: false, error: `Failed to set remote: ${e.message}` };
@@ -89,17 +89,17 @@ export function syncPush() {
 
   if (totalChanges === 0) {
     // Check if there are any uncommitted changes in the sync dir
-    const gitStatus = git('status --porcelain');
+    const gitStatus = git(['status', '--porcelain']);
     if (!gitStatus) {
       return { ok: true, message: 'Everything up to date.', changes };
     }
   }
 
-  git('add -A');
+  git(['add', '-A']);
 
   try {
     const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
-    git(`commit -m "Quiver sync ${timestamp}"`);
+    git(['commit', '-m', `Quiver sync ${timestamp}`]);
   } catch {
     // Nothing to commit
   }
@@ -107,14 +107,14 @@ export function syncPush() {
   // Determine branch name
   let branch = 'main';
   try {
-    branch = git('rev-parse --abbrev-ref HEAD');
+    branch = git(['rev-parse', '--abbrev-ref', 'HEAD']);
   } catch {}
 
   try {
     if (!hasCommits()) {
       return { ok: false, error: 'No commits to push.' };
     }
-    git(`push -u origin ${branch}`);
+    git(['push', '-u', 'origin', branch], { timeout: 60000 });
   } catch (e) {
     const msg = e.stderr || e.message;
     if (msg.includes('rejected')) {
@@ -141,11 +141,11 @@ export function syncPull() {
 
   let branch = 'main';
   try {
-    branch = git('rev-parse --abbrev-ref HEAD');
+    branch = git(['rev-parse', '--abbrev-ref', 'HEAD']);
   } catch {}
 
   try {
-    git(`pull --rebase origin ${branch}`);
+    git(['pull', '--rebase', 'origin', branch], { timeout: 60000 });
   } catch (e) {
     const msg = e.stderr || e.message;
     if (msg.includes('Could not resolve host') || msg.includes('fatal: unable to access')) {
@@ -187,15 +187,15 @@ export function syncStatus() {
 
   const diff = diffLocalVsSync();
   let remote = null;
-  try { remote = git('remote get-url origin'); } catch {}
+  try { remote = git(['remote', 'get-url', 'origin']); } catch {}
 
   let remoteChanges = 0;
   if (remote) {
     try {
-      git('fetch origin');
+      git(['fetch', 'origin'], { timeout: 60000 });
       let branch = 'main';
-      try { branch = git('rev-parse --abbrev-ref HEAD'); } catch {}
-      const log = git(`log HEAD..origin/${branch} --oneline`);
+      try { branch = git(['rev-parse', '--abbrev-ref', 'HEAD']); } catch {}
+      const log = git(['log', `HEAD..origin/${branch}`, '--oneline']);
       remoteChanges = log ? log.split('\n').length : 0;
     } catch {}
   }

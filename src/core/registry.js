@@ -418,7 +418,8 @@ export async function installPlugin(name, marketplaceId) {
         });
         return { ok: true, message: `Installed ${name} from ${gitUrl}` };
       } catch (e) {
-        return { ok: false, error: `Clone failed: ${e.stderr || e.message}` };
+        const detail = (e.stderr || e.message || '').replace(/\/[^\s:]+/g, '<path>');
+      return { ok: false, error: `Clone failed: ${detail}` };
       }
     }
 
@@ -439,7 +440,8 @@ export async function installPlugin(name, marketplaceId) {
         return { ok: true, message: `Installed ${name}` };
       } catch (e) {
         try { rmSync(tmpDir, { recursive: true, force: true }); } catch {}
-        return { ok: false, error: `Install failed: ${e.stderr || e.message}` };
+        const detail = (e.stderr || e.message || '').replace(/\/[^\s:]+/g, '<path>');
+        return { ok: false, error: `Install failed: ${detail}` };
       }
     }
 
