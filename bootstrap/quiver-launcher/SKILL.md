@@ -16,16 +16,10 @@ You are launching Quiver — a web UI for managing Claude Code skills.
    Run `node --version`. If it fails, tell the user they need Node.js installed and suggest: `brew install node`
 
 2. **Check if quiver is installed:**
-   Run `npm list -g quiver 2>/dev/null`.
+   Run `npm list -g quiver-skill-manager 2>/dev/null`.
 
 3. **If NOT installed, install it:**
-   Run `npm install -g quiver`
-
-   If the npm registry package isn't available yet, clone and link:
-   ```
-   git clone https://github.com/YOUR_USERNAME/quiver.git /tmp/quiver
-   cd /tmp/quiver && npm install && npm link
-   ```
+   Run `npm install -g quiver-skill-manager`
 
 4. **Launch the web UI:**
    Run `quiver ui`
