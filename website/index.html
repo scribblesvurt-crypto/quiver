@@ -320,6 +320,7 @@
 
       <div class="install-tabs">
         <button class="install-tab active" onclick="showTab('app')">macOS App</button>
+        <button class="install-tab" onclick="showTab('claude')">From Claude</button>
         <button class="install-tab" onclick="showTab('npm')">npm</button>
       </div>
 
@@ -344,6 +345,36 @@
             <div class="step-body">
               <h4>Your skills, instantly</h4>
               <p>Quiver opens <code>localhost:3456</code> and scans your skills automatically. That's it.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="install-content" id="tab-claude">
+        <div class="install-steps">
+          <div class="install-step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <h4>Download the Quiver launcher skill</h4>
+              <p>Save this file to your computer. It tells Claude how to install and launch Quiver for you.</p>
+              <a href="https://raw.githubusercontent.com/scribblesvurt-crypto/quiver/main/bootstrap/quiver-launcher/SKILL.md" download="SKILL.md" class="btn" style="margin-top:10px;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download SKILL.md
+              </a>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <h4>Upload it to Claude</h4>
+              <p>In Claude, go to <strong>Customize → Skills → Create plugin → Upload plugin</strong> and upload the file.</p>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <h4>Say "Launch Quiver"</h4>
+              <p>Claude will install everything and open the web UI for you. No terminal needed.</p>
             </div>
           </div>
         </div>
