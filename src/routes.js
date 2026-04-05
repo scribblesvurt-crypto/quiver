@@ -13,8 +13,42 @@ import { SKILLS_DIR, PLUGINS_DIR } from './core/paths.js';
 import { syncInit, syncSetRemote, syncPush, syncPull, syncStatus } from './core/sync/index.js';
 import { listAvailablePlugins, listCategories, listSources, setSourceEnabled, installPlugin } from './core/registry.js';
 import { getUpdateSummary, checkAllUpdates, updatePlugin } from './core/updates.js';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 const upload = multer({ dest: join(tmpdir(), 'skill-manager-uploads'), limits: { fileSize: 10 * 1024 * 1024 } });
+
+/* ── Quiver self-update check ─────────────────── */
+const __dirname_routes = dirname(fileURLToPath(import.meta.url));
+const CURRENT_VERSION = (() => {
+  try {
+    const pkg = JSON.parse(readFileSync(join(__dirname_routes, '..', 'package.json'), 'utf8'));
+    return pkg.version;
+  } catch { return '0.0.0'; }
+})();
+
+let latestVersionCache = { version: null, checkedAt: 0 };
+
+async function getLatestVersion() {
+  const now = Date.now();
+  // Cache for 1 hour
+  if (latestVersionCache.version && (now - latestVersionCache.checkedAt) < 3600000) {
+    return latestVersionCache.version;
+  }
+  try {
+    const res = await fetch('https://registry.npmjs.org/quiver-skill-manager/latest', {
+      headers: { 'Accept': 'application/json' },
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!res.ok) return latestVersionCache.version || CURRENT_VERSION;
+    const data = await res.json();
+    latestVersionCache = { version: data.version, checkedAt: now };
+    return data.version;
+  } catch {
+    return latestVersionCache.version || CURRENT_VERSION;
+  }
+}
 
 /** Escape special XML characters to prevent injection in plist generation. */
 function escapeXml(str) {
@@ -351,6 +385,20 @@ export function createRoutes() {
       res.status(result.ok ? 200 : 400).json(result);
     } catch (e) {
       res.status(500).json({ ok: false, error: sanitizeError(e.message) });
+    }
+  });
+
+  // ── Quiver version check ──
+  router.get('/version', async (req, res) => {
+    try {
+      const latest = await getLatestVersion();
+      res.json({
+        current: CURRENT_VERSION,
+        latest,
+        updateAvailable: latest !== CURRENT_VERSION && latest > CURRENT_VERSION
+      });
+    } catch (e) {
+      res.json({ current: CURRENT_VERSION, latest: CURRENT_VERSION, updateAvailable: false });
     }
   });
 

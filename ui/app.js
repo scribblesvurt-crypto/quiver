@@ -110,7 +110,8 @@ const api = {
   },
   async registryUpdates() { const r = await fetch('/api/registry/updates'); return r.json(); },
   async registryCheckUpdates() { const r = await fetch('/api/registry/updates/check', { method: 'POST' }); return r.json(); },
-  async registryUpdate(name, marketplace) { const r = await fetch('/api/registry/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, marketplace }) }); return r.json(); }
+  async registryUpdate(name, marketplace) { const r = await fetch('/api/registry/update', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, marketplace }) }); return r.json(); },
+  async checkVersion() { const r = await fetch('/api/version'); return r.json(); }
 };
 
 // --- Toast ---
@@ -685,6 +686,7 @@ function App() {
   const [browseLoaded, setBrowseLoaded] = useState(false);
   const [showSources, setShowSources] = useState(false);
   const [pluginUpdates, setPluginUpdates] = useState({});
+  const [versionInfo, setVersionInfo] = useState(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -718,6 +720,9 @@ function App() {
       const map = {};
       for (const u of (d.updates || [])) map[`${u.marketplace}/${u.name}`] = u;
       setPluginUpdates(map);
+    }).catch(() => {});
+    api.checkVersion().then(v => {
+      if (v.updateAvailable) setVersionInfo(v);
     }).catch(() => {});
   }, []);
 
@@ -800,6 +805,13 @@ function App() {
   }
 
   return html`
+    ${versionInfo && html`
+      <div class="update-banner">
+        Quiver v${versionInfo.latest} is available (you have v${versionInfo.current}).
+        Run <code>npm update -g quiver-skill-manager</code> to update.
+        <button class="update-banner-close" onClick=${() => setVersionInfo(null)}>✕</button>
+      </div>
+    `}
     <div class="header">
       <h1>Quiver</h1>
       <div class="header-actions">

@@ -1,6 +1,6 @@
 {
   "name": "quiver-skill-manager",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Manage Claude Code skills with a web UI and CLI",
   "type": "module",
   "bin": {
