@@ -524,7 +524,15 @@ body {
   font-size: 13px;
   box-shadow: var(--shadow-lg);
   animation: fadeIn 0.2s ease;
+  max-width: 420px;
+  word-wrap: break-word;
+  line-height: 1.5;
   z-index: 200;
+}
+
+.toast.toast-error {
+  background: #dc2626;
+  color: white;
 }
 
 @keyframes fadeIn {

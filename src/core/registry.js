@@ -6,6 +6,30 @@ import { loadConfig, setConfigValue } from './config.js';
 import { CONFIG_DIR } from './paths.js';
 import { recordInstall } from './updates.js';
 
+function checkGitAvailable() {
+  try {
+    execFileSync('git', ['--version'], { stdio: 'pipe' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function friendlyGitError(e) {
+  const msg = (e.stderr || e.message || '').toLowerCase();
+  if (msg.includes('xcode-select') || msg.includes('no developer tools'))
+    return 'Git is not installed. On macOS, open Terminal and run "xcode-select --install", then try again.';
+  if (msg.includes('repository not found') || msg.includes('404'))
+    return 'Repository not found. The plugin source may have been moved or deleted.';
+  if (msg.includes('timed out') || msg.includes('timeout'))
+    return 'Connection timed out. Check your internet connection and try again.';
+  if (msg.includes('could not resolve'))
+    return 'Could not connect to the server. Check your internet connection.';
+  // Fallback: truncate to something readable
+  const raw = (e.stderr || e.message || 'Unknown error').split('\n')[0];
+  return raw.length > 120 ? raw.slice(0, 120) + '...' : raw;
+}
+
 const PLUGINS_BASE = join(homedir(), '.claude', 'plugins');
 const KNOWN_MARKETPLACES_FILE = join(PLUGINS_BASE, 'known_marketplaces.json');
 const REGISTRY_CACHE_DIR = join(CONFIG_DIR, 'registry-cache');
@@ -373,6 +397,9 @@ export async function listCategories() {
  * For remote marketplaces: clone the marketplace repo and extract the plugin.
  */
 export async function installPlugin(name, marketplaceId) {
+  if (!checkGitAvailable()) {
+    return { ok: false, error: 'Git is not installed. On macOS, open Terminal and run "xcode-select --install" to install it, then try again.' };
+  }
   // Find the plugin in the catalog
   const allPlugins = await listAvailablePlugins();
   const plugin = allPlugins.find(p => p.name === name);
@@ -425,8 +452,7 @@ export async function installPlugin(name, marketplaceId) {
         });
         return { ok: true, message: `Installed ${name} from ${gitUrl}` };
       } catch (e) {
-        const detail = (e.stderr || e.message || '').replace(/\/[^\s:]+/g, '<path>');
-      return { ok: false, error: `Clone failed: ${detail}` };
+        return { ok: false, error: friendlyGitError(e) };
       }
     }
 
@@ -453,8 +479,7 @@ export async function installPlugin(name, marketplaceId) {
         return { ok: true, message: `Installed ${name}` };
       } catch (e) {
         try { rmSync(tmpDir, { recursive: true, force: true }); } catch {}
-        const detail = (e.stderr || e.message || '').replace(/\/[^\s:]+/g, '<path>');
-        return { ok: false, error: `Install failed: ${detail}` };
+        return { ok: false, error: friendlyGitError(e) };
       }
     }
 
@@ -505,6 +530,6 @@ export async function installPlugin(name, marketplaceId) {
     return { ok: true, message: `Installed ${name} to ~/.claude/skills/` };
   } catch (e) {
     try { rmSync(tmpDir, { recursive: true, force: true }); } catch {}
-    return { ok: false, error: `Install failed: ${e.message}` };
+    return { ok: false, error: friendlyGitError(e) };
   }
 }
