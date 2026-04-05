@@ -862,6 +862,25 @@ body {
     align-items: flex-start;
     gap: 12px;
   }
+
+  .cli-row {
+    grid-template-columns: 1fr;
+  }
+
+  .cli-cmd {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cli-desc {
+    display: block !important;
+  }
+
+  .cli-desc span {
+    display: block !important;
+    padding: 10px 20px !important;
+    border-right: none !important;
+  }
 }
 
 @media (max-width: 480px) {
