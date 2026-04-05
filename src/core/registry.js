@@ -441,16 +441,43 @@ export async function installPlugin(name, marketplaceId) {
     if (gitUrl) {
       try {
         mkdirSync(join(localMP.installLocation, 'external_plugins'), { recursive: true });
-        execFileSync('git', ['clone', '--depth', '1', gitUrl, destDir], {
-          encoding: 'utf-8', stdio: 'pipe', timeout: 120000
-        });
-        const commitHash = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: destDir, stdio: 'pipe' }).toString().trim();
-        recordInstall(name, mp.id || 'unknown', {
-          installPath: destDir,
-          sourceRepo: source.repo || source.url || null,
-          commitHash
-        });
-        return { ok: true, message: `Installed ${name} from ${gitUrl}` };
+        const subPath = source.path || null;
+
+        if (subPath) {
+          // Clone to temp, extract just the plugin subdirectory
+          const tmpDir = join(REGISTRY_CACHE_DIR, `_tmp_${name}_${Date.now()}`);
+          execFileSync('git', ['clone', '--depth', '1', gitUrl, tmpDir], {
+            encoding: 'utf-8', stdio: 'pipe', timeout: 120000
+          });
+          const commitHash = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmpDir, stdio: 'pipe' }).toString().trim();
+          const srcDir = join(tmpDir, subPath);
+          if (existsSync(srcDir)) {
+            cpSync(srcDir, destDir, { recursive: true });
+          } else {
+            rmSync(tmpDir, { recursive: true, force: true });
+            return { ok: false, error: `Plugin path "${subPath}" not found in repo` };
+          }
+          rmSync(tmpDir, { recursive: true, force: true });
+          recordInstall(name, mp.id || 'unknown', {
+            installPath: destDir,
+            sourceRepo: source.repo || source.url || null,
+            commitHash
+          });
+        } else {
+          // No subpath — clone directly, then clean up .git
+          execFileSync('git', ['clone', '--depth', '1', gitUrl, destDir], {
+            encoding: 'utf-8', stdio: 'pipe', timeout: 120000
+          });
+          const commitHash = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: destDir, stdio: 'pipe' }).toString().trim();
+          // Remove .git directory — users don't need repo history
+          try { rmSync(join(destDir, '.git'), { recursive: true, force: true }); } catch {}
+          recordInstall(name, mp.id || 'unknown', {
+            installPath: destDir,
+            sourceRepo: source.repo || source.url || null,
+            commitHash
+          });
+        }
+        return { ok: true, message: `Installed ${name}` };
       } catch (e) {
         return { ok: false, error: friendlyGitError(e) };
       }
